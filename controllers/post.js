@@ -45,7 +45,7 @@ export const createPost = async (req, res) => {
 
     for (let i = 0; i < pictures.length; i++) {
       const url =
-        "https://postify-development-images.s3.eu-central-1.amazonaws.com/";
+        "https://objectone12.s3.eu-north-1.amazonaws.com/";
       const pictureUrl = url + pictures[i];
       picture.push(pictureUrl);
     }
@@ -229,9 +229,9 @@ export const updatePost = async (req, res) => {
 
     if (pictures.length > 0) {
       const url =
-        "https://postify-development-images.s3.eu-central-1.amazonaws.com/";
+        "https://objectone12.s3.eu-north-1.amazonaws.com/";
       picture = pictures.map((key) => url + key);
-      post.pictures = [];
+      // post.pictures = [];
       post.pictures = picture;
     }
 

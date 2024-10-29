@@ -275,7 +275,7 @@ export const setProfilePicture = async (req, res) => {
 
     if (profilePicture.length > 0) {
       const url =
-        "https://postify-development-images.s3.eu-central-1.amazonaws.com/";
+        "https://objectone12.s3.eu-north-1.amazonaws.com/";
       picture = profilePicture.map((key) => url + key);
       user.profilePicture = picture;
     }

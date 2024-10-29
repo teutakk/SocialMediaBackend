@@ -29,7 +29,7 @@ export const createProduct = async (req, res) => {
 
     for (let i = 0; i < images.length; i++) {
       const url =
-        "https://postify-development-images.s3.eu-central-1.amazonaws.com/";
+        "https://objectone12.s3.eu-north-1.amazonaws.com/";
       const imageUrl = url + images[i];
       image.push(imageUrl);
     }

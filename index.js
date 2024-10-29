@@ -37,8 +37,8 @@ app.use('/chat', chatRoutes);
 app.use('/message', messagesRoutes);
 
 const MONGO_URL = process.env.MONGO_URL;
-const PORT = process.env.PORT || 9999;
-
+const PORT = process.env.PORT;
+console.log("Connecting to MongoDB using URL:", MONGO_URL);
 try {
   mongoose
     .connect(MONGO_URL, {
@@ -46,7 +46,10 @@ try {
       useUnifiedTopology: true,
     })
     .then(() => {
-      console.log("DB Connected Successfully");
+      console.log("DB Connected Successfully"); 
+    })
+    .catch((err) => {
+      console.error("DB Connection Error: ", err.message);
     });
 } catch (err) {
   console.log(`${err}: did not connect.`);

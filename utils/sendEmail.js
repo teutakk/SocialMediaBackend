@@ -14,6 +14,9 @@ let transporter = nodemailer.createTransport({
     user: AUTH_EMAIL,
     pass: AUTH_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
 
 export const sendVerificationEmail = async (user, res) => {
@@ -71,12 +74,13 @@ export const sendVerificationEmail = async (user, res) => {
         })
         .catch((err) => {
           console.log(err);
-          res.status(404).json({ message: "Something went wrong" });
+          res.status(404).json({ message: "Something went wrong",
+            error: err.message });
         });
     }
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: "Something went wrong" });
+    res.status(404).json({ message: "Something went wrong", error: err.message });
   }
 };
 
