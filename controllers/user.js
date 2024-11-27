@@ -4,6 +4,7 @@ import About from "../models/About.js";
 import Verification from "../models/emailVerification.js";
 import { compareString, hashString } from "../utils/helpers.js";
 import { insertMultipleObjects } from "../aws/S3Client.js";
+import Post from "../models/Post.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -316,9 +317,18 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    res.status(200).json(updatedUser);
+    const newAuthorName = `${firstName} ${lastName}`;
+    await Post.updateMany(
+      {userId},
+      { $set: {author: newAuthorName}}
+    );
+
+    res.status(200).json({
+      message: "User and associated posts updated successfully",
+      user: updateUser
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating user: ", error);
     res.status(500).json({ message: "Internal server error." });
   }
 };
