@@ -281,8 +281,20 @@ export const setProfilePicture = async (req, res) => {
       user.profilePicture = picture;
     }
 
+    //save the updated user profile
     await user.save();
-    return res.status(201).json(user);
+
+    // Update posts with the new profile picture
+    await Post.updateMany(
+      { userId }, //match all the posts by this user
+      { $set: {userProfilePicture: picture[0] }} //update the user profile field
+    )
+
+    return res.status(201).json({
+      message: "Profile picture and associated posts updated successfully.",
+      user,
+    });
+
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -291,7 +303,7 @@ export const setProfilePicture = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { firstName, lastName, gender, email } = req.body;
+    const { firstName, lastName, gender, email, profilePicture } = req.body;
 
     // Validate if the provided user ID is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -307,6 +319,7 @@ export const updateUser = async (req, res) => {
           lastName,
           gender,
           email,
+          profilePicture
         },
       },
       { new: true }
@@ -317,15 +330,25 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    //Here we updated also the posts the user did with old name to the newer one
     const newAuthorName = `${firstName} ${lastName}`;
+
+    const updateFields = {
+      author: newAuthorName,
+    }
+
+    if (profilePicture) {
+      updateFields.profilePicture = profilePicture;
+    }
+
     await Post.updateMany(
       {userId},
-      { $set: {author: newAuthorName}}
+      { $set: updateFields}
     );
 
     res.status(200).json({
       message: "User and associated posts updated successfully",
-      user: updateUser
+      user: updatedUser
     });
   } catch (error) {
     console.error("Error updating user: ", error);
