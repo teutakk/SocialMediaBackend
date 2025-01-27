@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema(
       max: 30,
     },
     profilePicture: [{ type: String }],
+    coverPicture: [{ type: String }],
     email: {
       type: String,
       required: true,

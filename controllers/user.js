@@ -5,6 +5,7 @@ import Verification from "../models/emailVerification.js";
 import { compareString, hashString } from "../utils/helpers.js";
 import { insertMultipleObjects } from "../aws/S3Client.js";
 import Post from "../models/Post.js";
+import Comments from "../models/CommentModel.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -300,15 +301,67 @@ export const setProfilePicture = async (req, res) => {
   }
 };
 
+export const setCoverPicture = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let coverPicture = [];
+
+    if (req.files) {
+      try {
+        const keys = await insertMultipleObjects(req.files);
+        coverPicture = keys;
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+    }
+
+    let cover = [];
+
+    if (coverPicture.length > 0) {
+      const url =
+        "https://objectone12.s3.eu-north-1.amazonaws.com/";
+        cover = coverPicture.map((key) => url + key);
+      user.coverPicture = cover;
+    }
+
+    //save the updated user profile
+    await user.save();
+
+    return res.status(201).json({
+      message: "Cover picture and associated posts updated successfully.",
+      user,
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 export const updateUser = async (req, res) => {
   try {
+
+    // kKCKC po du useri qe osht i bom logged in me i ndrru fotoja e profilit neper te gjitha postet ku ka komentu 
+    // dmth duhet me e kqyr me marr id prej body jo params edhe me e dergu foton e profilit si update tek shum poste me userId-n e njejte si t lo
+    //ggedin userit
     const { userId } = req.params;
+    // console.log("userIdddd "+ userId);
+    console.error("this is an error")
     const { firstName, lastName, gender, email, profilePicture } = req.body;
+    console.log(req.body);
+    // const { comm } = req.body;
+
 
     // Validate if the provided user ID is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID format." });
-    }
+    // if (!mongoose.Types.ObjectId.isValid(_id)) {
+    //   return res.status(400).json({ message: "Invalid user ID format." });
+    // }
 
     // Update user details
     const updatedUser = await User.findByIdAndUpdate(
@@ -319,7 +372,7 @@ export const updateUser = async (req, res) => {
           lastName,
           gender,
           email,
-          profilePicture
+          profilePicture,
         },
       },
       { new: true }
@@ -340,12 +393,22 @@ export const updateUser = async (req, res) => {
     if (profilePicture) {
       updateFields.profilePicture = profilePicture;
     }
+    // if(profilePicture){
+    //   updateFields.commenterProfilePicture = profilePicture
+    // }
 
     await Post.updateMany(
-      {userId},
+      { userId },
       { $set: updateFields}
     );
-
+   
+    await Comments.updateMany(
+      { userId },
+      { $set: updateFields }
+    )
+    
+    
+  
     res.status(200).json({
       message: "User and associated posts updated successfully",
       user: updatedUser

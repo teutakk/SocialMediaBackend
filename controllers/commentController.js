@@ -28,6 +28,7 @@ export const createComment = async (req, res) => {
     await createCommentNotification(author, postId, post.userId);
 
     
+    
     const comment = new Comments({
       postId,
       userId,
@@ -35,6 +36,7 @@ export const createComment = async (req, res) => {
       author: author,
       commenterProfilePicture: profilePicture
     });
+    
 
     await comment.save();
 

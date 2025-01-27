@@ -13,6 +13,7 @@ import {
   deleteUserAbout,
   setProfilePicture,
   updateUser,
+  setCoverPicture,
 } from "../controllers/user.js";
 import { getUserPosts } from "../controllers/post.js";
 import { verifyEmail } from "../controllers/user.js";
@@ -32,6 +33,11 @@ router.put(
   "/users/profilePicture/:userId",
   upload.array("profilePicture", 1),
   setProfilePicture
+);
+router.post(
+  "/users/coverPicture/:userId",
+  upload.array("coverPicture", 1),
+  setCoverPicture
 );
 router.get("/users/:userId/posts", getUserPosts);
 router.post("/users/:userId/about", createUserAbout);
